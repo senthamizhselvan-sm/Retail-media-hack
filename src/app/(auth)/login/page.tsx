@@ -2,15 +2,30 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { api } from '@/lib/api'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle login logic here
-    console.log('Login attempt:', { email, password })
+    
+    try {
+      // Call API service - FIXED: Use login, not signup
+      const response = await api.login(email, password)
+      
+      // Store user data
+      localStorage.setItem('creativeUser', JSON.stringify(response.user))
+      localStorage.setItem('authToken', response.token)
+      
+      // Redirect to dashboard
+      window.location.href = '/dashboard'
+      
+    } catch (error) {
+      console.error('Login failed:', error)
+      alert('Login failed. Please try again.')
+    }
   }
 
   return (
