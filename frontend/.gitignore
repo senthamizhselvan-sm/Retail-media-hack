@@ -1,0 +1,27 @@
+node_modules/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+build/
+dist/
+.DS_Store
+*.log
+coverage/
+
+# Test files
+*.test.js
+*.test.ts
+*.test.tsx
+
+# Temporary files
+*.tmp
+*.temp
+
+# IDE files
+.vscode/
+.idea/
+
+# Source maps
+*.map
