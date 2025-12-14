@@ -8,31 +8,42 @@ const generateToken = (id) => {
   });
 };
 
-// @desc    Register new user (mock for testing without MongoDB)
+// @desc    Register new user
 // @route   POST /api/auth/register
 // @access  Public
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    console.log(`🔓 Mock registration for: ${name} (${email})`);
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'User already exists with this email',
+      });
+    }
 
-    // Mock user creation (no database)
-    const mockUser = {
-      id: 'mock-user-' + Date.now(),
-      name: name || 'Test User',
-      email: email || 'test@example.com',
-      role: 'user',
-      avatar: 'https://via.placeholder.com/150',
-    };
+    // Create user
+    const user = await User.create({
+      name,
+      email,
+      password,
+    });
 
-    // Generate mock token
-    const token = 'mock-jwt-token-' + Date.now();
+    // Generate token
+    const token = generateToken(user._id);
 
     res.status(201).json({
       success: true,
       token,
-      user: mockUser,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -42,31 +53,47 @@ exports.register = async (req, res) => {
   }
 };
 
-// @desc    Login user (mock for testing without MongoDB)
+// @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log(`🔓 Mock login for: ${email}`);
+    // Check if user exists and password is correct
+    const user = await User.findOne({ email }).select('+password');
+    if (!user || !(await user.matchPassword(password))) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid credentials',
+      });
+    }
 
-    // Mock user login (no database)
-    const mockUser = {
-      id: 'mock-user-' + Date.now(),
-      name: 'Test User',
-      email: email || 'test@example.com',
-      role: 'user',
-      avatar: 'https://via.placeholder.com/150',
-    };
+    // Check if user is active
+    if (!user.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: 'Account is disabled',
+      });
+    }
 
-    // Generate mock token
-    const token = 'mock-jwt-token-' + Date.now();
+    // Update last login
+    user.lastLogin = new Date();
+    await user.save();
+
+    // Generate token
+    const token = generateToken(user._id);
 
     res.json({
       success: true,
       token,
-      user: mockUser,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -76,26 +103,24 @@ exports.login = async (req, res) => {
   }
 };
 
-// @desc    Get current user (mock for testing without MongoDB)
+// @desc    Get current user
 // @route   GET /api/auth/me
 // @access  Private
 exports.getMe = async (req, res) => {
   try {
-    console.log('🔓 Mock /me endpoint called');
-
-    // Return mock user data
-    const mockUser = {
-      id: 'mock-user-123',
-      name: 'Test User',
-      email: 'test@example.com',
-      role: 'user',
-      avatar: 'https://via.placeholder.com/150',
-      createdAt: new Date().toISOString(),
-    };
+    const user = await User.findById(req.user.id);
 
     res.json({
       success: true,
-      user: mockUser,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin,
+      },
     });
   } catch (error) {
     res.status(500).json({

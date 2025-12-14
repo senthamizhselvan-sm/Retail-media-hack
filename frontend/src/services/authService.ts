@@ -31,8 +31,8 @@ export const authService = {
     localStorage.removeItem('user');
   },
 
-  getMe: async (): Promise<User> => {
+  getMe: async (): Promise<{ user: User }> => {
     const response = await api.get('/auth/me');
-    return response.data.user;
+    return response.data;
   },
 };

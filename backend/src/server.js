@@ -12,9 +12,8 @@ const favoriteRoutes = require('./routes/favoriteRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const orchestratorRoutes = require('./routes/orchestratorRoutes');
 
-// Connect to database (skip for now)
-console.log('📡 MongoDB connection skipped - running without database');
-// connectDB();
+// Connect to database
+connectDB();
 
 const app = express();
 

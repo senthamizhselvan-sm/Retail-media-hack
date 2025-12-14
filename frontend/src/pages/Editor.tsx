@@ -192,7 +192,12 @@ const Editor: React.FC = () => {
                 <img
                   src={currentImage}
                   alt="Original"
-                  style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+                  style={{ 
+                    width: '100%', 
+                    maxHeight: '300px', 
+                    objectFit: 'contain',
+                    background: 'var(--color-background)'
+                  }}
                   onError={() => toast.error('Failed to load image')}
                 />
               </div>

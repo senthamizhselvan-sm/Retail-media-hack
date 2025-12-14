@@ -1,22 +1,8 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// Protect routes - verify JWT token (simplified for testing without MongoDB)
+// Protect routes - verify JWT token
 exports.protect = async (req, res, next) => {
-  // Skip auth for testing - just create a mock user
-  req.user = {
-    id: 'test-user-123',
-    name: 'Test User',
-    email: 'test@example.com',
-    role: 'user',
-    isActive: true
-  };
-  
-  console.log('🔓 Auth bypassed for testing (no MongoDB)');
-  next();
-  
-  // Original auth code (commented out for testing):
-  /*
   let token;
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -55,7 +41,6 @@ exports.protect = async (req, res, next) => {
       message: 'Not authorized to access this route',
     });
   }
-  */
 };
 
 // Admin only middleware

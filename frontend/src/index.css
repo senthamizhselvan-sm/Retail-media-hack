@@ -469,8 +469,9 @@ p {
 /* Image Gallery */
 .image-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--spacing-lg);
+  align-items: start;
 }
 
 .image-item {
@@ -487,8 +488,10 @@ p {
 
 .image-item img {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+  background: var(--color-background);
 }
 
 .image-actions {

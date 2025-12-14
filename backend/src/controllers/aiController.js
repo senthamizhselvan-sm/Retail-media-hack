@@ -2,6 +2,36 @@ const axios = require('axios');
 const cloudinary = require('../config/cloudinary');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
+// Helper function to detect and preserve text content in prompts
+function preserveTextContent(prompt) {
+  // Extract quoted text, specific text mentions, and preserve them
+  const textPatterns = [
+    /"([^"]+)"/g,  // Text in quotes
+    /'([^']+)'/g,  // Text in single quotes
+    /text[:\s]+"([^"]+)"/gi,  // "text: 'content'"
+    /write[:\s]+"([^"]+)"/gi, // "write: 'content'"
+    /says?[:\s]+"([^"]+)"/gi, // "says: 'content'"
+  ];
+  
+  const preservedTexts = [];
+  let processedPrompt = prompt;
+  
+  textPatterns.forEach(pattern => {
+    const matches = prompt.match(pattern);
+    if (matches) {
+      matches.forEach(match => {
+        preservedTexts.push(match);
+      });
+    }
+  });
+  
+  return {
+    originalPrompt: prompt,
+    preservedTexts,
+    hasSpecificText: preservedTexts.length > 0
+  };
+}
+
 // @desc    Enhance user prompt using Gemini AI
 // @route   Helper function
 // @access  Private
@@ -9,23 +39,36 @@ async function enhancePromptWithAI(userPrompt) {
   try {
     console.log('🧠 Enhancing user prompt with Gemini AI...');
     
+    // First, analyze and preserve any specific text content
+    const textAnalysis = preserveTextContent(userPrompt);
+    
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    const enhancementPrompt = `You are a professional prompt engineer for AI image generation. Take the user's basic request and transform it into a detailed, comprehensive prompt that will generate high-quality results.
+    const enhancementPrompt = `You are a professional prompt engineer for AI image generation. Analyze the user's request and create a detailed, realistic prompt.
 
 USER REQUEST: "${userPrompt}"
 
-Please analyze this request and create a detailed prompt that includes:
+${textAnalysis.hasSpecificText ? `
+CRITICAL - PRESERVE THESE EXACT TEXTS: ${textAnalysis.preservedTexts.join(', ')}
+These texts MUST appear exactly as written in the final image. Do not change, translate, or modify them.
+` : ''}
 
-1. MAIN SUBJECT/THEME: What is the primary focus?
-2. VISUAL STYLE: What artistic style or aesthetic is needed?
-3. DESIGN REQUIREMENTS: Specific design elements, colors, composition
-4. TECHNICAL SPECIFICATIONS: Quality, format, professional requirements
-5. CONTEXT/PURPOSE: What is this image for? (marketing, personal, business, etc.)
-6. DETAILED ELEMENTS: Specific objects, decorations, text areas, layouts
+IMPORTANT RULES:
+1. PRESERVE LANGUAGE: If the user specifies text content in any language, preserve that EXACT text and language
+2. NO RANDOM TEXT: Never add random or placeholder text - only use text specifically mentioned by the user
+3. REALISTIC FOCUS: Emphasize photorealistic, professional quality imagery
+4. CULTURAL ACCURACY: Respect cultural elements and traditional designs mentioned
+5. TEXT CLARITY: If text is specified, ensure it's clearly readable and professionally rendered
 
-Transform the user's simple request into a comprehensive, detailed prompt that will produce professional, high-quality results. Be specific about colors, styles, layouts, and visual elements.
+ANALYSIS REQUIRED:
+1. MAIN SUBJECT: What is the primary focus?
+2. TEXT CONTENT: What specific text/language does the user want? (preserve exactly)
+3. VISUAL STYLE: Professional, realistic, high-quality photography
+4. CULTURAL CONTEXT: Any cultural/traditional elements to respect
+5. TECHNICAL SPECS: Professional photography standards
+
+Create a detailed prompt that will generate realistic, professional images with accurate text content (if specified).
 
 ENHANCED PROMPT:`;
 
@@ -35,6 +78,10 @@ ENHANCED PROMPT:`;
     console.log('✅ Prompt enhanced successfully!');
     console.log('Original:', userPrompt.substring(0, 100) + '...');
     console.log('Enhanced:', enhancedPrompt.substring(0, 200) + '...');
+    
+    if (textAnalysis.hasSpecificText) {
+      console.log('🔤 Preserved texts:', textAnalysis.preservedTexts.join(', '));
+    }
     
     return enhancedPrompt;
     
@@ -64,13 +111,54 @@ exports.generateImage = async (req, res) => {
       }
     }
 
-    // Apply style-specific enhancements
+    // Apply style-specific enhancements with focus on realism and text accuracy
     const stylePrompts = {
-      realistic: `${finalPrompt}\n\nSTYLE: Highly realistic, photographic quality, professional photography, high detail, sharp focus.`,
-      artistic: `${finalPrompt}\n\nSTYLE: Artistic interpretation, creative, expressive, beautiful colors, artistic flair.`,
-      cartoon: `${finalPrompt}\n\nSTYLE: Cartoon illustration, animated style, fun, colorful, cartoon aesthetics.`,
-      abstract: `${finalPrompt}\n\nSTYLE: Abstract art, modern, contemporary, bold shapes and colors, artistic abstraction.`,
-      photographic: `${finalPrompt}\n\nSTYLE: Professional photograph, studio quality, perfect lighting, high resolution.`
+      realistic: `${finalPrompt}
+
+STYLE REQUIREMENTS:
+- Photorealistic, professional photography quality
+- Sharp focus, perfect lighting, high resolution
+- Natural colors and realistic textures
+- Professional commercial photography standards
+- If text is specified, render it clearly and accurately in the correct language
+- No random or placeholder text - only use specified text content`,
+
+      artistic: `${finalPrompt}
+
+STYLE REQUIREMENTS:
+- Artistic but realistic interpretation
+- Professional art quality with realistic elements
+- Beautiful, natural colors with artistic flair
+- High detail and professional finish
+- Preserve any specified text content accurately`,
+
+      cartoon: `${finalPrompt}
+
+STYLE REQUIREMENTS:
+- High-quality cartoon illustration style
+- Professional animation quality
+- Vibrant, appealing colors
+- Clean, detailed artwork
+- Maintain text accuracy if specified`,
+
+      abstract: `${finalPrompt}
+
+STYLE REQUIREMENTS:
+- Modern abstract art interpretation
+- Professional artistic quality
+- Bold, contemporary design
+- High-resolution artistic finish
+- Respect any text content specified`,
+
+      photographic: `${finalPrompt}
+
+STYLE REQUIREMENTS:
+- Professional studio photography
+- Perfect lighting and composition
+- Commercial photography standards
+- Ultra-high resolution and clarity
+- Crystal clear text rendering if text is specified
+- No random text - only user-specified content`
     };
 
     const enhancedPrompt = stylePrompts[style] || stylePrompts.realistic;
@@ -84,8 +172,8 @@ exports.generateImage = async (req, res) => {
       for (let i = 0; i < count; i++) {
         console.log(`🎨 Generating image ${i + 1}/${count} with Pollinations AI...`);
         
-        // Use Pollinations AI
-        const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?width=${width}&height=${height}&seed=${Date.now() + i}&model=flux`;
+        // Use Pollinations AI with enhanced parameters for better quality
+        const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?width=${width}&height=${height}&seed=${Date.now() + i}&model=flux&enhance=true&nologo=true&private=false`;
         
         // Download and upload to Cloudinary for consistency
         const imageResponse = await axios.get(pollinationsUrl, { responseType: 'arraybuffer' });
@@ -191,21 +279,24 @@ exports.editImage = async (req, res) => {
       console.log('🎨 Creating AI-edited image based on user prompt...');
 
       // Create a detailed prompt for image-to-image editing that incorporates the user's request
-      const img2imgPrompt = `Edit and enhance this image: ${editPrompt}. 
-      
-Create a high-quality, realistic image that:
-1. Applies the specific modifications requested: ${editPrompt}
-2. Maintains professional quality and composition
-3. Enhances the overall visual appeal
-4. Makes the requested changes with attention to detail
-5. Preserves the essence while applying improvements
+      const img2imgPrompt = `${editPrompt}
 
-Generate a realistic, high-quality edited version based on the user's specific request.`;
+EDITING REQUIREMENTS:
+- Create a photorealistic, professional quality image
+- Apply the specific modifications requested by the user
+- If text content is specified, render it clearly in the correct language
+- NO random text - only use text specifically mentioned by the user
+- Maintain high resolution and professional composition
+- Preserve cultural accuracy and context if applicable
+- Focus on realistic, natural-looking results
+- Professional photography quality standards
+
+Generate a realistic, high-quality edited image that precisely follows the user's instructions.`;
 
       console.log('🎨 Generating edited image with Pollinations AI...');
 
-      // Use Pollinations AI for image editing with the detailed prompt
-      const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(img2imgPrompt)}?width=1024&height=1024&seed=${Date.now()}&model=flux&enhance=true`;
+      // Use Pollinations AI for image editing with enhanced parameters
+      const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(img2imgPrompt)}?width=1024&height=1024&seed=${Date.now()}&model=flux&enhance=true&nologo=true&private=false&refine=true`;
       
       // Generate the edited image
       const editedImageResponse = await axios.get(pollinationsUrl, { responseType: 'arraybuffer' });

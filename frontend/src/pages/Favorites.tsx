@@ -191,7 +191,12 @@ const Favorites: React.FC = () => {
               <img
                 src={favorite.imageUrl}
                 alt="Favorite"
-                style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+                style={{ 
+                  width: '100%', 
+                  maxHeight: '300px', 
+                  objectFit: 'contain',
+                  background: 'var(--color-background)'
+                }}
               />
               <div style={{ padding: 'var(--spacing-md)' }}>
                 {favorite.prompt && (

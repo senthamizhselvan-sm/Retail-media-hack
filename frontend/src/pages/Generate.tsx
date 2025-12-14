@@ -330,7 +330,13 @@ Examples:
                     <img
                       src={uploadedImage}
                       alt="Uploaded"
-                      style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '4px' }}
+                      style={{ 
+                        width: '100%', 
+                        maxHeight: '300px', 
+                        objectFit: 'contain', 
+                        borderRadius: '4px',
+                        background: 'var(--color-background)'
+                      }}
                     />
                   </div>
                 )}

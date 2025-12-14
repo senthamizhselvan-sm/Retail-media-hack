@@ -34,21 +34,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const checkAuth = async () => {
-    // For testing without MongoDB - auto-login with mock user
-    const mockUser = {
-      id: 'mock-user-123',
-      name: 'Test User',
-      email: 'test@example.com',
-      role: 'user',
-      avatar: 'https://via.placeholder.com/150',
-    };
-    
-    setUser(mockUser);
-    localStorage.setItem('token', 'mock-token-123');
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    console.log('🔓 Auto-logged in with mock user for testing');
-    
-    setLoading(false);
+    try {
+      // Check if user has a valid token in localStorage
+      const token = localStorage.getItem('token');
+      const savedUser = localStorage.getItem('user');
+      
+      if (token && savedUser) {
+        // Verify token with backend
+        const response = await authService.getMe();
+        setUser(response.user);
+        console.log('✅ User authenticated from saved session');
+      } else {
+        // No saved session, user needs to login
+        console.log('🔐 No saved session found, user needs to login');
+        setUser(null);
+      }
+    } catch (error) {
+      // Token invalid or expired, clear saved data
+      console.log('❌ Saved session invalid, clearing auth data');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const login = async (email: string, password: string) => {
@@ -80,10 +89,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       await authService.logout();
+      // Clear all auth data from localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
       setUser(null);
       toast.success('Logged out successfully');
     } catch (error) {
-      toast.error('Logout failed');
+      // Even if logout API fails, clear local data
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
+      toast.success('Logged out successfully');
     }
   };
 
