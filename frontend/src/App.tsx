@@ -17,6 +17,15 @@ import Favorites from './pages/Favorites';
 import Profile from './pages/Profile';
 import Admin from './pages/Admin';
 
+// Business Operating System Pages
+import BusinessHome from './pages/BusinessHome';
+import DailyAssistant from './pages/DailyAssistant';
+import OfferPlanning from './pages/OfferPlanning';
+import CustomerCommunication from './pages/CustomerCommunication';
+import CompetitorAwareness from './pages/CompetitorAwareness';
+import BrandMemory from './pages/BrandMemory';
+import SalesReflection from './pages/SalesReflection';
+
 const App: React.FC = () => {
   return (
     <ThemeProvider>
@@ -28,6 +37,66 @@ const App: React.FC = () => {
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            
+            {/* Business Operating System Routes */}
+            <Route
+              path="/business-home"
+              element={
+                <ProtectedRoute>
+                  <BusinessHome />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/daily-assistant"
+              element={
+                <ProtectedRoute>
+                  <DailyAssistant />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/offer-planning"
+              element={
+                <ProtectedRoute>
+                  <OfferPlanning />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/customer-communication"
+              element={
+                <ProtectedRoute>
+                  <CustomerCommunication />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/competitor-awareness"
+              element={
+                <ProtectedRoute>
+                  <CompetitorAwareness />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/brand-memory"
+              element={
+                <ProtectedRoute>
+                  <BrandMemory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/sales-reflection"
+              element={
+                <ProtectedRoute>
+                  <SalesReflection />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Legacy Routes (now Marketing Tools) */}
             <Route
               path="/dashboard"
               element={

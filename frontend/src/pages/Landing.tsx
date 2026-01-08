@@ -2,25 +2,58 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Landing: React.FC = () => {
-  const features = [
+  const businessFeatures = [
+    {
+      title: 'Business Command Center',
+      description: 'Monitor your shop\'s daily health with smart indicators and voice summaries',
+      icon: '🏠',
+    },
+    {
+      title: 'Daily Business Assistant',
+      description: 'Get AI-powered advice for stock placement, visibility, and selling psychology',
+      icon: '📊',
+    },
+    {
+      title: 'Smart Offer Planning',
+      description: 'Plan strategic offers around festivals, salary cycles, and market rush days',
+      icon: '📅',
+    },
+    {
+      title: 'Customer Communication',
+      description: 'WhatsApp reply templates in English, Tamil, and Hindi for all situations',
+      icon: '💬',
+    },
+    {
+      title: 'Competitor Awareness',
+      description: 'Track competitor prices and get smart positioning advice',
+      icon: '🎯',
+    },
+    {
+      title: 'Brand Memory & Trust',
+      description: 'Maintain consistent brand identity across all business communications',
+      icon: '🏪',
+    },
+  ];
+
+  const marketingFeatures = [
     {
       title: 'AI Image Generation',
-      description: 'Create professional images from text prompts using advanced AI technology',
+      description: 'Create professional marketing images from text prompts',
       icon: '🎨',
     },
     {
-      title: 'Smart Editor',
-      description: 'Edit and enhance images with AI-powered tools and intelligent processing',
+      title: 'Smart Image Editor',
+      description: 'Edit and enhance images with AI-powered tools',
       icon: '✨',
     },
     {
-      title: 'Multiple Styles',
-      description: 'Choose from various artistic styles and professional formats',
-      icon: '🖼️',
+      title: 'Multiple Languages',
+      description: 'Generate content in English, Tamil, and Hindi',
+      icon: '🌍',
     },
     {
-      title: 'Fast Processing',
-      description: 'Generate professional marketing creatives in seconds, not hours',
+      title: 'Professional Quality',
+      description: 'Enterprise-grade results for small business needs',
       icon: '⚡',
     },
   ];
@@ -29,18 +62,27 @@ const Landing: React.FC = () => {
     <div style={{ minHeight: '100vh' }}>
       {/* Hero Section */}
       <div className="content-container" style={{ paddingTop: 'var(--spacing-xxl)', paddingBottom: 'var(--spacing-xxl)' }}>
-        <div className="text-center" style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h1 style={{ marginBottom: 'var(--spacing-xl)' }}>
-            Create Professional Marketing Creatives with AI
+        <div className="text-center" style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <h1 style={{ marginBottom: 'var(--spacing-lg)' }}>
+            RetailGen AI - Complete Business Operating System
           </h1>
+          <p style={{ 
+            fontSize: '20px', 
+            color: 'var(--color-text-primary)', 
+            marginBottom: 'var(--spacing-md)',
+            fontWeight: 600
+          }}>
+            Beyond Ads. Beyond Pricing. A Complete Business System.
+          </p>
           <p style={{ 
             fontSize: '18px', 
             color: 'var(--color-text-secondary)', 
             marginBottom: 'var(--spacing-xxl)',
             lineHeight: '1.6'
           }}>
-            Transform your creative production with intelligent AI-powered tools. 
-            Generate professional marketing materials without needing a design team.
+            RetailGen AI is not just a marketing tool. It is a complete business operating system 
+            for Indian small vendors. From daily business advice to customer communication, 
+            competitor analysis to brand management - everything you need to grow your business.
           </p>
           <div style={{ display: 'flex', gap: 'var(--spacing-lg)', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link to="/register">
@@ -57,24 +99,28 @@ const Landing: React.FC = () => {
         </div>
       </div>
 
-      {/* Features Section */}
+      {/* Business Operating System Section */}
       <div style={{ backgroundColor: 'var(--color-surface)', padding: 'var(--spacing-xxl) 0' }}>
         <div className="content-container">
           <div className="text-center mb-xxl">
             <h2 style={{ marginBottom: 'var(--spacing-lg)' }}>
-              Everything you need for creative production
+              Complete Business Operating System
             </h2>
             <p style={{ color: 'var(--color-text-secondary)', fontSize: '16px' }}>
-              Professional-grade AI tools designed for modern marketing teams
+              Everything you need to run and grow your small business
             </p>
           </div>
           
-          <div className="grid grid-4">
-            {features.map((feature, index) => (
-              <div key={index} className="card text-center">
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+            gap: 'var(--spacing-xl)' 
+          }}>
+            {businessFeatures.map((feature, index) => (
+              <div key={index} className="card">
                 <div style={{ 
-                  fontSize: '48px', 
-                  marginBottom: 'var(--spacing-lg)',
+                  fontSize: '32px', 
+                  marginBottom: 'var(--spacing-md)',
                   display: 'block'
                 }}>
                   {feature.icon}
@@ -82,12 +128,48 @@ const Landing: React.FC = () => {
                 <h3 style={{ marginBottom: 'var(--spacing-md)' }}>
                   {feature.title}
                 </h3>
-                <p style={{ color: 'var(--color-text-secondary)' }}>
+                <p style={{ color: 'var(--color-text-secondary)', lineHeight: '1.6' }}>
                   {feature.description}
                 </p>
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Marketing Tools Section */}
+      <div className="content-container" style={{ padding: 'var(--spacing-xxl) 0' }}>
+        <div className="text-center mb-xxl">
+          <h2 style={{ marginBottom: 'var(--spacing-lg)' }}>
+            AI-Powered Marketing Tools
+          </h2>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '16px' }}>
+            Create professional marketing materials with advanced AI
+          </p>
+        </div>
+        
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+          gap: 'var(--spacing-lg)' 
+        }}>
+          {marketingFeatures.map((feature, index) => (
+            <div key={index} className="card text-center">
+              <div style={{ 
+                fontSize: '48px', 
+                marginBottom: 'var(--spacing-lg)',
+                display: 'block'
+              }}>
+                {feature.icon}
+              </div>
+              <h3 style={{ marginBottom: 'var(--spacing-md)' }}>
+                {feature.title}
+              </h3>
+              <p style={{ color: 'var(--color-text-secondary)' }}>
+                {feature.description}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 

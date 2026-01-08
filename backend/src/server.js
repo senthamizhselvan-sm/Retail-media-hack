@@ -12,6 +12,15 @@ const favoriteRoutes = require('./routes/favoriteRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const orchestratorRoutes = require('./routes/orchestratorRoutes');
 
+// Business Operating System routes
+const businessRoutes = require('./routes/businessRoutes');
+const dailyAssistantRoutes = require('./routes/dailyAssistantRoutes');
+const planningRoutes = require('./routes/planningRoutes');
+const customerRoutes = require('./routes/customerRoutes');
+const competitionRoutes = require('./routes/competitionRoutes');
+const reflectionRoutes = require('./routes/reflectionRoutes');
+const growthRoutes = require('./routes/growthRoutes');
+
 // Connect to database
 connectDB();
 
@@ -35,6 +44,15 @@ app.use('/api/users', userRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/orchestrator', orchestratorRoutes);
+
+// Business Operating System routes
+app.use('/api/business', businessRoutes);
+app.use('/api/daily', dailyAssistantRoutes);
+app.use('/api/planning', planningRoutes);
+app.use('/api/customer', customerRoutes);
+app.use('/api/competition', competitionRoutes);
+app.use('/api/reflection', reflectionRoutes);
+app.use('/api/growth', growthRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
